@@ -1,0 +1,66 @@
+#!/bin/sh
+#
+# The comprtconfig script for the altaria comprt.
+
+sleep 5
+
+# ensure we are in root's HOME dir
+cd "${HOME}" || return 1
+
+# constants
+GITHUB_USER_NAME="cavcrosby"
+VBOX_DEB_PKG_URL="https://download.virtualbox.org/virtualbox/6.1.22/virtualbox-6.1_6.1.22-144080~Debian~buster_amd64.deb"
+vbox_deb_pkgname="$(basename ${VBOX_DEB_PKG_URL})"
+jenkins_infrastructure_repo_url="https://github.com/${GITHUB_USER_NAME}/jenkins-infrastructurec"
+jenkins_infrastructure_repo_name="$(basename "${jenkins_infrastructure_repo_url}")"
+general_purpose_scripts_repo_url="https://github.com/${GITHUB_USER_NAME}/general-purpose-scripts"
+general_purpose_scripts_repo_name="$(basename "${general_purpose_scripts_repo_url}")"
+JENKINS_USER_NAME="jenkins"
+jenkins_group_name="${JENKINS_USER_NAME}"
+JENKINS_USER_ID="1000"
+JENKINS_GROUP_ID="1000"
+jenkins_user_home="/home/${JENKINS_USER_NAME}"
+
+# sudo and gnupg are required, gnupg for dealing with package public key pairs.
+# shellcheck disable=2140
+SYSTEM_DEPENDENCIES="git "\
+"gnupg "\
+"linux-headers-$(uname --kernel-release) "\
+"sudo "\
+"wget"
+
+# general updating, and install system dependencies
+apt-get update
+apt-get dist-upgrade --assume-yes
+apt-get install "${SYSTEM_DEPENDENCIES}" --assume-yes
+wget --output-document "${vbox_deb_pkgname}" "${VBOX_DEB_PKG_URL}"
+apt-get install "${PWD}/${vbox_deb_pkgname}" --assume-yes
+
+# add jenkins group and user
+groupadd --gid "${JENKINS_GROUP_ID}" "${jenkins_group_name}"
+useradd --create-home --home-dir "${jenkins_user_home}" \
+    --uid "${JENKINS_USER_ID}" --gid "${JENKINS_GROUP_ID}" \
+    --shell /bin/bash "${JENKINS_USER_NAME}" --password "${SUDOER_PASSWORD_CRYPT}"
+echo "# added by $(basename "$0")" > "/etc/sudoers.d/${JENKINS_USER_NAME}"
+echo "${JENKINS_USER_NAME} ALL=(ALL:ALL) ALL" >> "/etc/sudoers.d/${JENKINS_USER_NAME}"
+
+# install few aliases for jenkins user
+cat << _EOF_ > "${jenkins_user_home}/.bash_aliases"
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias grep='grep --color=auto'
+alias l='ls -CF'
+alias la='ls -A'
+alias ll='ls -alF'
+alias ls='ls --color=auto'
+_EOF_
+
+# make jenkins agent dir for hosts
+mkdir --parents "/var/lib/jenkins-agent/main-node1"
+
+# setup tools for the jenkins user
+cd "${jenkins_user_home}" || return 1
+git clone "${jenkins_infrastructure_repo_url}" "${jenkins_infrastructure_repo_name}"
+git clone "${general_purpose_scripts_repo_url}" "${general_purpose_scripts_repo_name}"
+
+exit 0

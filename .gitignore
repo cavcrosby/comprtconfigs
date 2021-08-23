@@ -1,0 +1,10 @@
+# repo specfic
+.conf
+
+# files generated from shtpls
+altaria/*
+brave/*
+!altaria/*.shtpl
+!altaria/README.md
+!brave/*.shtpl
+!brave/README.md
