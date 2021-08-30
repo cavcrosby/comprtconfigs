@@ -27,7 +27,7 @@ cat << _EOF_
 #
 # Config file to centralize vars, and to aggregate common vars.
 
-# needed to construct altaria's comprtconfig
+# needed to construct altaria's comprtconfig and brave's comprtconfig
 export SUDOER_PASSWORD_CRYPT=
 _EOF_
 endef
