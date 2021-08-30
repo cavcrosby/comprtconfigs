@@ -25,7 +25,6 @@ jenkins_user_home="/home/${JENKINS_USER_NAME}"
 # shellcheck disable=2140
 SYSTEM_DEPENDENCIES="git "\
 "gnupg "\
-"linux-headers-$(uname --kernel-release) "\
 "sudo "\
 "wget"
 
@@ -38,9 +37,10 @@ apt-get install "${PWD}/${vbox_deb_pkgname}" --assume-yes
 
 # add jenkins group and user
 groupadd --gid "${JENKINS_GROUP_ID}" "${jenkins_group_name}"
+# shellcheck disable=2016
 useradd --create-home --home-dir "${jenkins_user_home}" \
     --uid "${JENKINS_USER_ID}" --gid "${JENKINS_GROUP_ID}" \
-    --shell /bin/bash "${JENKINS_USER_NAME}" --password "${SUDOER_PASSWORD_CRYPT}"
+    --shell /bin/bash "${JENKINS_USER_NAME}" --password '${SUDOER_PASSWORD_CRYPT}'
 echo "# added by $(basename "$0")" > "/etc/sudoers.d/${JENKINS_USER_NAME}"
 echo "${JENKINS_USER_NAME} ALL=(ALL:ALL) ALL" >> "/etc/sudoers.d/${JENKINS_USER_NAME}"
 
