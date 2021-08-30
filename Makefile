@@ -53,7 +53,7 @@ ${HELP}:
 >	@echo '                     make targets. Particularly targets that utilize shell'
 >	@echo '                     templates.'
 >	@echo '  ${ALTARIA}          - the build node environment for the jenkins-torkel container'
->	@echo '  ${BRAVE}          - the environment for deploying docker containers'
+>	@echo '  ${BRAVE}            - the environment for deploying docker containers'
 >	@echo '  ${CLEAN}            - removes files generated from other targets'
 
 ${PROJECT_CONFIG_FILE_NAME}:
