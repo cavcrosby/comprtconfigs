@@ -41,7 +41,8 @@ apt-get dist-upgrade --assume-yes
 
 # setup for installing the Docker engine, for reference:
 # https://docs.docker.com/engine/install/debian/#install-using-the-repository
-apt-get install "${DOCKER_DEPENDENCIES}" --assume-yes
+# shellcheck disable=2086
+apt-get install ${DOCKER_DEPENDENCIES} --assume-yes
 curl --fail --show-error --location "https://download.docker.com/linux/debian/gpg" \
     | sudo gpg --dearmor --output "${DOCKER_GPG_KEY_PATH}"
 echo \
@@ -49,7 +50,12 @@ echo \
   $(lsb_release --codename --short) stable" | sudo tee /etc/apt/sources.list.d/docker.list
 
 apt-get update
-apt-get install "${SYSTEM_DEPENDENCIES}"
+# shellcheck disable=2086
+apt-get install ${SYSTEM_DEPENDENCIES}
+
+# sets initial git client information so git repos can be retrieved
+git config --global user.email "conner@cavcrosby.tech"
+git config --global user.name "Conner Crosby"
 
 # add user, user group, and docker group
 groupadd --gid "${GROUP_ID}" "${group_name}"

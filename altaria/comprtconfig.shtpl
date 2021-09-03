@@ -9,9 +9,7 @@ cd "${HOME}" || return 1
 
 # constants
 GITHUB_USER_NAME="cavcrosby"
-VBOX_DEB_PKG_URL="https://download.virtualbox.org/virtualbox/6.1.22/virtualbox-6.1_6.1.22-144080~Debian~buster_amd64.deb"
-vbox_deb_pkgname="$(basename ${VBOX_DEB_PKG_URL})"
-jenkins_infrastructure_repo_url="https://github.com/${GITHUB_USER_NAME}/jenkins-infrastructurec"
+jenkins_infrastructure_repo_url="https://github.com/${GITHUB_USER_NAME}/jenkins-infrastructure"
 jenkins_infrastructure_repo_name="$(basename "${jenkins_infrastructure_repo_url}")"
 general_purpose_scripts_repo_url="https://github.com/${GITHUB_USER_NAME}/general-purpose-scripts"
 general_purpose_scripts_repo_name="$(basename "${general_purpose_scripts_repo_url}")"
@@ -31,9 +29,18 @@ SYSTEM_DEPENDENCIES="git "\
 # general updating, and install system dependencies
 apt-get update
 apt-get dist-upgrade --assume-yes
-apt-get install "${SYSTEM_DEPENDENCIES}" --assume-yes
-wget --output-document "${vbox_deb_pkgname}" "${VBOX_DEB_PKG_URL}"
-apt-get install "${PWD}/${vbox_deb_pkgname}" --assume-yes
+# shellcheck disable=2086
+apt-get install ${SYSTEM_DEPENDENCIES} --assume-yes
+
+# install virtualbox, inspired by:
+# https://vitux.com/how-to-install-virtualbox-on-debian-10/
+wget https://www.virtualbox.org/download/oracle_vbox_2016.asc --output-document - | apt-key add -
+echo "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian buster contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+apt-get update && apt-get install virtualbox-6.0 --assume-yes
+
+# sets initial git client information so git repos can be retrieved
+git config --global user.email "conner@cavcrosby.tech"
+git config --global user.name "Conner Crosby"
 
 # add jenkins group and user
 groupadd --gid "${JENKINS_GROUP_ID}" "${jenkins_group_name}"
