@@ -17,9 +17,9 @@ CLEAN = clean
 ENVSUBST = envsubst
 
 # should list all the vars in the multiline var below
-SUDOER_PASSWORD_CRYPT = $${SUDOER_PASSWORD_CRYPT}
+_SUDOER_PASSWORD_CRYPT = $${SUDOER_PASSWORD_CRYPT}
 project_config_file_vars = \
-	${SUDOER_PASSWORD_CRYPT}\
+	${_SUDOER_PASSWORD_CRYPT}
 
 define PROJECT_CONFIG_FILE =
 cat << _EOF_
@@ -41,6 +41,9 @@ SHELL_TEMPLATE_EXT := .shtpl
 shell_template_wildcard := %${SHELL_TEMPLATE_EXT}
 script_shell_templates := $(shell find ${CURDIR} -name *${SHELL_TEMPLATE_EXT})
 
+# to be passed in at make runtime
+PREPROCESS_ALIASES =
+
 # Determines the config name(s) to be generated from the template(s).
 # Short hand notation for string substitution: $(text:pattern=replacement).
 scripts := $(script_shell_templates:${SHELL_TEMPLATE_EXT}=)
@@ -61,13 +64,22 @@ ${PROJECT_CONFIG_FILE_NAME}:
 
 .PHONY: ${ALTARIA}
 ${ALTARIA}:
+# assumes that configs will be exported into the env
+ifdef PREPROCESS_ALIASES
+>	cd "$@" && ${ENVSUBST} '${project_config_file_vars}' < "comprtconfig.shtpl" > "comprtconfig"
+else
 >	@[ -f "${CURDIR}/${PROJECT_CONFIG_FILE_NAME}" ] || { echo "${PROJECT_CONFIG_FILE_NAME} must be generated, run 'make ${PROJECT_CONFIG_FILE_NAME}'"; exit 1; }
 >	. "${CURDIR}/${PROJECT_CONFIG_FILE_NAME}" && cd "$@" && ${ENVSUBST} '${project_config_file_vars}' < "comprtconfig.shtpl" > "comprtconfig"
+endif
 
 .PHONY: ${BRAVE}
 ${BRAVE}:
+ifdef PREPROCESS_ALIASES
+>	cd "$@" && ${ENVSUBST} '${project_config_file_vars}' < "comprtconfig.shtpl" > "comprtconfig"
+else
 >	@[ -f "${CURDIR}/${PROJECT_CONFIG_FILE_NAME}" ] || { echo "${PROJECT_CONFIG_FILE_NAME} must be generated, run 'make ${PROJECT_CONFIG_FILE_NAME}'"; exit 1; }
 >	. "${CURDIR}/${PROJECT_CONFIG_FILE_NAME}" && cd "$@" && ${ENVSUBST} '${project_config_file_vars}' < "comprtconfig.shtpl" > "comprtconfig"
+endif
 
 .PHONY: ${CLEAN}
 ${CLEAN}:
