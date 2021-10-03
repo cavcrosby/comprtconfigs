@@ -35,7 +35,8 @@ apt-get install ${SYSTEM_DEPENDENCIES} --assume-yes
 # install virtualbox, inspired by:
 # https://vitux.com/how-to-install-virtualbox-on-debian-10/
 wget https://www.virtualbox.org/download/oracle_vbox_2016.asc --output-document - | apt-key add -
-echo "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian buster contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+echo "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian $(lsb_release --codename --short) contrib" \
+    | sudo tee /etc/apt/sources.list.d/virtualbox.list
 apt-get update && apt-get install virtualbox-6.0 --assume-yes
 
 # sets initial git client information so git repos can be retrieved
