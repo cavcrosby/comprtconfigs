@@ -15,8 +15,8 @@ general_purpose_scripts_repo_url="https://github.com/${GITHUB_USER_NAME}/general
 general_purpose_scripts_repo_name="$(basename "${general_purpose_scripts_repo_url}")"
 JENKINS_USER_NAME="jenkins"
 jenkins_group_name="${JENKINS_USER_NAME}"
-JENKINS_USER_ID="1000"
-JENKINS_GROUP_ID="1000"
+jenkins_user_id="${DEBCOMPRT_DEFAULT_LOGIN_UID}"
+jenkins_group_id="${DEBCOMPRT_DEFAULT_LOGIN_UID}"
 jenkins_user_home="/home/${JENKINS_USER_NAME}"
 
 # sudo and gnupg are required, gnupg for dealing with package public key pairs.
@@ -44,10 +44,10 @@ git config --global user.email "conner@cavcrosby.tech"
 git config --global user.name "Conner Crosby"
 
 # add jenkins group and user
-groupadd --gid "${JENKINS_GROUP_ID}" "${jenkins_group_name}"
+groupadd --gid "${jenkins_group_id}" "${jenkins_group_name}"
 # shellcheck disable=2016
 useradd --create-home --home-dir "${jenkins_user_home}" \
-    --uid "${JENKINS_USER_ID}" --gid "${JENKINS_GROUP_ID}" \
+    --uid "${jenkins_user_id}" --gid "${jenkins_group_id}" \
     --shell /bin/bash "${JENKINS_USER_NAME}" --password '${SUDOER_PASSWORD_CRYPT}'
 echo "# added by $(basename "$0")" > "/etc/sudoers.d/${JENKINS_USER_NAME}"
 echo "${JENKINS_USER_NAME} ALL=(ALL:ALL) ALL" >> "/etc/sudoers.d/${JENKINS_USER_NAME}"
