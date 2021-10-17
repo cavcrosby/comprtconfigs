@@ -23,6 +23,7 @@ jenkins_user_home="/home/${JENKINS_USER_NAME}"
 # shellcheck disable=2140
 SYSTEM_DEPENDENCIES="git "\
 "gnupg "\
+"lsb-release "\
 "sudo "\
 "wget"
 
