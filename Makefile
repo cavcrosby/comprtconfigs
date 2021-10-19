@@ -44,7 +44,7 @@ script_shell_templates := $(shell find ${CURDIR} -name *${SHELL_TEMPLATE_EXT})
 # to be passed in at make runtime
 PREPROCESS_ALIASES =
 
-# Determines the config name(s) to be generated from the template(s).
+# Determines the script name(s) to be generated from the template(s).
 # Short hand notation for string substitution: $(text:pattern=replacement).
 scripts := $(script_shell_templates:${SHELL_TEMPLATE_EXT}=)
 
